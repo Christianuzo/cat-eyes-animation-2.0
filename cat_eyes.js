@@ -21,16 +21,16 @@ function createEye() {
     const eyeball = new THREE.Mesh(eyeGeometry, eyeMaterial);
 
     // Pupil
-    const pupilGeometry = new THREE.SphereGeometry(0.6, 32, 32); // Adjusted size to match larger eye
+    const pupilGeometry = new THREE.SphereGeometry(0.4, 32, 32); // Adjusted size to match larger eye
     const pupil = new THREE.Mesh(pupilGeometry, pupilMaterial);
-    pupil.position.z = 1.6; // Adjusted to match larger eye
+    pupil.position.z = 1.8; // Adjusted to match larger eye
 
     eyeGroup.add(eyeball);
     eyeGroup.add(pupil);
     
     eyeGroup.userData = {
         isBlinking: false,
-        blinkDuration: 200, // in milliseconds
+        blinkDuration: 300, // in milliseconds
         blinkStartTime: 0,
         pupil
     };
@@ -48,7 +48,7 @@ rightEye.position.x = 4; // Adjusted spacing
 scene.add(leftEye);
 scene.add(rightEye);
 
-camera.position.z = 10; // Adjusted to fit larger eyes
+camera.position.z = 12; // Adjusted to fit larger eyes
 
 // Function to update eye blink
 function updateBlink(eye) {
@@ -107,7 +107,7 @@ function lookAround() {
             resetToStraight();
             setTimeout(startLookAround, lookStraightTime);
         }, lookAroundInterval);
-    }, 200); // Delay pupil movement until after the blink
+    }, 300); // Delay pupil movement until after the blink
 }
 
 function resetToStraight() {
