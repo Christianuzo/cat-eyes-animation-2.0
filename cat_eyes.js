@@ -16,14 +16,14 @@ const pupilMaterial = new THREE.MeshBasicMaterial({ color: 0x000000 });
 // Function to create an eye
 function createEye() {
     const eyeGroup = new THREE.Group();
-    const eyeGeometry = new THREE.SphereGeometry(1, 32, 32);
+    const eyeGeometry = new THREE.SphereGeometry(2, 32, 32); // Increased size
     eyeGeometry.scale(1.2, 1, 1); // make the eye oval
     const eyeball = new THREE.Mesh(eyeGeometry, eyeMaterial);
 
     // Pupil
-    const pupilGeometry = new THREE.SphereGeometry(0.3, 32, 32);
+    const pupilGeometry = new THREE.SphereGeometry(0.6, 32, 32); // Adjusted size to match larger eye
     const pupil = new THREE.Mesh(pupilGeometry, pupilMaterial);
-    pupil.position.z = 0.8;
+    pupil.position.z = 1.6; // Adjusted to match larger eye
 
     eyeGroup.add(eyeball);
     eyeGroup.add(pupil);
@@ -42,13 +42,13 @@ function createEye() {
 const leftEye = createEye();
 const rightEye = createEye();
 
-leftEye.position.x = -3;
-rightEye.position.x = 3;
+leftEye.position.x = -4; // Adjusted spacing
+rightEye.position.x = 4; // Adjusted spacing
 
 scene.add(leftEye);
 scene.add(rightEye);
 
-camera.position.z = 8;
+camera.position.z = 10; // Adjusted to fit larger eyes
 
 // Function to update eye blink
 function updateBlink(eye) {
@@ -78,12 +78,6 @@ function blink(eye) {
     }
 }
 
-// Set interval for blinking every second
-setInterval(() => {
-    blink(leftEye);
-    blink(rightEye);
-}, 1000);
-
 // Automatic pupil movement
 let lookDirections = [
     { x: 0, y: 0 }, // Straight
@@ -95,14 +89,25 @@ let lookDirections = [
 let currentLookIndex = 0;
 let lookStraightTime = 2000;
 let lookAroundInterval = 2000;
+let isCursorMoving = false;
+let lookAroundTimeout = null;
 
 function lookAround() {
-    const lookPosition = lookDirections[currentLookIndex];
-    [leftEye, rightEye].forEach(eye => {
-        eye.userData.pupil.position.x = lookPosition.x;
-        eye.userData.pupil.position.y = lookPosition.y;
-    });
-    currentLookIndex = (currentLookIndex + 1) % lookDirections.length;
+    blink(leftEye);
+    blink(rightEye);
+
+    setTimeout(() => {
+        const lookPosition = lookDirections[currentLookIndex];
+        [leftEye, rightEye].forEach(eye => {
+            eye.userData.pupil.position.x = lookPosition.x;
+            eye.userData.pupil.position.y = lookPosition.y;
+        });
+        currentLookIndex = (currentLookIndex + 1) % lookDirections.length;
+        lookAroundTimeout = setTimeout(() => {
+            resetToStraight();
+            setTimeout(startLookAround, lookStraightTime);
+        }, lookAroundInterval);
+    }, 200); // Delay pupil movement until after the blink
 }
 
 function resetToStraight() {
@@ -113,15 +118,8 @@ function resetToStraight() {
 }
 
 // Initial state
-let isCursorMoving = false;
-let lookAroundTimeout = null;
-
 function startLookAround() {
     lookAround();
-    lookAroundTimeout = setTimeout(() => {
-        resetToStraight();
-        setTimeout(startLookAround, lookStraightTime);
-    }, lookAroundInterval);
 }
 
 // Event listener for mouse movement
